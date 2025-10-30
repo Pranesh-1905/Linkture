@@ -3,7 +3,7 @@ import { useAuth } from '../App'
 import { useTheme } from '../context/ThemeContext'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { Moon, Sun, LogOut, Compass, MessageCircle, User } from 'lucide-react'
+import { Moon, Sun, LogOut, Compass, MessageCircle, User, Home } from 'lucide-react'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -32,7 +32,21 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {user && (
               <>
-                <Link 
+              <Link
+              to={
+                user?.role === 'vc' ? '/vc-dashboard' :
+                user?.role === 'startup' ? '/startup-dashboard' :
+                user?.role === 'student' ? '/student-dashboard' :  
+                '/dashboard'
+              } 
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium hidden sm:flex items-center gap-1"
+            >
+              <Home className="w-4 h-4" />
+
+
+              Home
+            </Link>
+              <Link
                   to="/explore" 
                   className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium hidden sm:flex items-center gap-1"
                 >

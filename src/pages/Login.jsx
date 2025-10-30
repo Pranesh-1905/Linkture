@@ -108,11 +108,7 @@ export default function Login() {
             </div>
 
             {/* Demo Credentials Info */}
-            <div className="bg-blue-50 dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
-              <p className="font-semibold text-blue-800 dark:text-blue-400 mb-1">Demo Credentials:</p>
-              <p className="text-blue-700 dark:text-blue-300">Email: {role}@linkture.com</p>
-              <p className="text-blue-700 dark:text-blue-300">Password: 12345</p>
-            </div>
+
 
             {/* Submit Button */}
             <motion.button

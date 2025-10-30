@@ -11,14 +11,14 @@ export default function Explore() {
   const categories = ['all', 'startups', 'investors', 'events', 'resources']
 
   const items = [
-    { id: 1, type: 'startup', name: 'TechNova AI', category: 'AI/ML', description: 'Building next-gen AI solutions for businesses', funding: '$2M', stage: 'Seed', image: '🤖' },
-    { id: 2, type: 'startup', name: 'EcoGrow', category: 'Sustainability', description: 'Sustainable farming solutions using IoT', funding: '$1.5M', stage: 'Seed', image: '🌱' },
-    { id: 3, type: 'investor', name: 'Alpha Ventures', category: 'VC Firm', description: 'Early-stage tech investor', investments: '50+', aum: '$100M', image: '💼' },
-    { id: 4, type: 'startup', name: 'HealthTech Pro', category: 'Healthcare', description: 'AI-powered health diagnostics', funding: '$3M', stage: 'Series A', image: '🏥' },
-    { id: 5, type: 'event', name: 'Startup Summit 2025', category: 'Networking', description: 'Annual gathering of founders and investors', date: 'Dec 15, 2025', location: 'San Francisco', image: '📅' },
-    { id: 6, type: 'investor', name: 'Beta Capital', category: 'Angel Network', description: 'Supporting early-stage founders', investments: '30+', aum: '$50M', image: '👥' },
-    { id: 7, type: 'startup', name: 'FinFlow', category: 'Fintech', description: 'Modern banking for startups', funding: '$5M', stage: 'Series A', image: '💳' },
-    { id: 8, type: 'resource', name: 'Pitch Deck Template', category: 'Tools', description: 'Professional pitch deck templates used by top startups', downloads: '10K+', rating: '4.9', image: '📊' },
+    { id: 1, type: 'startup', name: 'TechNova AI', category: 'AI/ML', description: 'Building next-gen AI solutions for businesses', funding: '$2M', stage: 'Seed', image: <img src='https://cdn-icons-png.flaticon.com/512/6385/6385037.png' alt="TechNova AI logo" /> },
+    { id: 2, type: 'startup', name: 'EcoGrow', category: 'Sustainability', description: 'Sustainable farming solutions using IoT', funding: '$1.5M', stage: 'Seed', image:<img src='https://cdn-icons-png.flaticon.com/512/1996/1996785.png' alt='Ecogrow'/> },
+    { id: 3, type: 'investor', name: 'Alpha Ventures', category: 'VC Firm', description: 'Early-stage tech investor', investments: '50+', aum: '$100M', image:<img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9q1K6805s-faPXDNcQp48IEIAcncD7-GDaQ&s'/> },
+    { id: 4, type: 'startup', name: 'HealthTech Pro', category: 'Healthcare', description: 'AI-powered health diagnostics', funding: '$3M', stage: 'Series A', image: <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTurIpg52ppGYJnA2w4mrhm_-utRhTCf6iOGA&s' /> },
+    { id: 5, type: 'event', name: 'Startup Summit 2025', category: 'Networking', description: 'Annual gathering of founders and investors', date: 'Dec 15, 2025', location: 'San Francisco', image: <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReeylPiam4EM4Z8Y5VYjTxwQXOZdpqXC8n-Q&s'/>},
+    { id: 6, type: 'investor', name: 'Beta Capital', category: 'Angel Network', description: 'Supporting early-stage founders', investments: '30+', aum: '$50M', image: <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmEJ-BgdT7L_-Wf-mDD-TFluEFcpfsZGsURw&s'/> },
+    { id: 7, type: 'startup', name: 'FinFlow', category: 'Fintech', description: 'Modern banking for startups', funding: '$5M', stage: 'Series A', image: <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTImPcEWpZzf_Qs-jxgUXqYLnTlNW99qWEXoQ&s'/> },
+    { id: 8, type: 'resource', name: 'Pitch Deck Template', category: 'Tools', description: 'Professional pitch deck templates used by top startups', downloads: '10K+', rating: '4.9', image: <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZmeJHB8PoInJGZE2eXsW22Bt-HYcoZHl1HA&s0'/>},
   ]
 
   const filteredItems = items.filter(item => {

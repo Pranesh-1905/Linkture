@@ -12,6 +12,7 @@ import Explore from './pages/Explore'
 import Messages from './pages/Messages'
 import Profile from './pages/Profile'
 
+
 const AuthContext = createContext()
 
 export const useAuth = () => useContext(AuthContext)
