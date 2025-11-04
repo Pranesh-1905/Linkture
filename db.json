@@ -1,0 +1,23 @@
+{
+  "portfolios": [
+    {
+      "id": 1,
+      "name": "Tech Startup 1",
+      "sector": "AI/ML",
+      "funding": "$1M",
+      "type": "pre-seed"
+    },
+    {
+      "id": 2,
+      "name": "HealthTech Co",
+      "sector": "Healthcare",
+      "funding": "$3M",
+      "type": "seed"
+    }
+  ],
+  "chartData": [
+    { "month": "Jan", "investment": 5 },
+    { "month": "Feb", "investment": 10 },
+    { "month": "Mar", "investment": 7 }
+  ]
+}
