@@ -1,21 +1,13 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Navbar from '../components/navbar'
+import { Send } from 'lucide-react'
 
 export default function Messages() {
   const [selectedChat, setSelectedChat] = useState(1)
   const [messageText, setMessageText] = useState('')
-
-  const chats = [
-    { id: 1, name: 'TechNova AI', avatar: '🤖', lastMessage: 'Thanks for your interest!', time: '2m ago', unread: 2 },
-    { id: 2, name: 'Alpha Ventures', avatar: '💼', lastMessage: 'Let\'s schedule a call', time: '1h ago', unread: 0 },
-    { id: 3, name: 'EcoGrow Team', avatar: '🌱', lastMessage: 'Pitch deck sent', time: '3h ago', unread: 1 },
-    { id: 4, name: 'Beta Capital', avatar: '👥', lastMessage: 'Great presentation!', time: '1d ago', unread: 0 },
-    { id: 5, name: 'HealthTech Pro', avatar: '🏥', lastMessage: 'Looking forward to collaborating', time: '2d ago', unread: 0 },
-  ]
-
-  const messages = {
+  const [conversations, setConversations] = useState({
     1: [
       { id: 1, sender: 'them', text: 'Hi! We saw your profile and are interested in learning more.', time: '10:30 AM' },
       { id: 2, sender: 'me', text: 'Great! I\'d love to discuss our Series A round.', time: '10:35 AM' },
@@ -27,15 +19,75 @@ export default function Messages() {
       { id: 2, sender: 'me', text: 'Thank you! Would you like to schedule a demo?', time: '9:20 AM' },
       { id: 3, sender: 'them', text: 'Let\'s schedule a call', time: '9:25 AM' },
     ],
-  }
+    3: [
+      { id: 1, sender: 'them', text: 'Pitch deck sent', time: '8:00 AM' },
+      { id: 2, sender: 'me', text: 'Received! Will review shortly.', time: '8:05 AM' },
+    ],
+    4: [
+      { id: 1, sender: 'them', text: 'Great presentation!', time: 'Yesterday' },
+      { id: 2, sender: 'me', text: 'Thank you! Looking forward to next steps.', time: 'Yesterday' },
+    ],
+    5: [
+      { id: 1, sender: 'them', text: 'Looking forward to collaborating', time: '2d ago' },
+    ],
+  })
+  const messagesEndRef = useRef(null)
+  const messagesContainerRef = useRef(null)
 
-  const currentMessages = messages[selectedChat] || []
+  const chats = [
+    { id: 1, name: 'TechNova AI', avatar: '🤖', lastMessage: conversations[1]?.[conversations[1].length - 1]?.text || 'No messages', time: '2m ago', unread: 2 },
+    { id: 2, name: 'Alpha Ventures', avatar: '💼', lastMessage: conversations[2]?.[conversations[2].length - 1]?.text || 'No messages', time: '1h ago', unread: 0 },
+    { id: 3, name: 'EcoGrow Team', avatar: '🌱', lastMessage: conversations[3]?.[conversations[3].length - 1]?.text || 'No messages', time: '3h ago', unread: 1 },
+    { id: 4, name: 'Beta Capital', avatar: '👥', lastMessage: conversations[4]?.[conversations[4].length - 1]?.text || 'No messages', time: '1d ago', unread: 0 },
+    { id: 5, name: 'HealthTech Pro', avatar: '🏥', lastMessage: conversations[5]?.[conversations[5].length - 1]?.text || 'No messages', time: '2d ago', unread: 0 },
+  ]
+
+  const currentMessages = conversations[selectedChat] || []
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [currentMessages, selectedChat])
+
+  // Get current time formatted
+  const getCurrentTime = () => {
+    const now = new Date()
+    return now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+  }
 
   const handleSend = (e) => {
     e.preventDefault()
     if (messageText.trim()) {
+      const newMessage = {
+        id: Date.now(),
+        sender: 'me',
+        text: messageText.trim(),
+        time: getCurrentTime()
+      }
+      
+      setConversations(prev => ({
+        ...prev,
+        [selectedChat]: [...(prev[selectedChat] || []), newMessage]
+      }))
+      
       toast.success('Message sent!')
       setMessageText('')
+      
+      // Simulate a reply after 2 seconds
+      setTimeout(() => {
+        const replyMessage = {
+          id: Date.now() + 1,
+          sender: 'them',
+          text: 'Thanks for your message! We\'ll get back to you shortly.',
+          time: getCurrentTime()
+        }
+        setConversations(prev => ({
+          ...prev,
+          [selectedChat]: [...(prev[selectedChat] || []), replyMessage]
+        }))
+      }, 2000)
     }
   }
 
@@ -102,25 +154,32 @@ export default function Messages() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {currentMessages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[70%] ${message.sender === 'me' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'} rounded-2xl px-4 py-2`}>
-                    <p>{message.text}</p>
-                    <p className={`text-xs mt-1 ${message.sender === 'me' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>{message.time}</p>
-                  </div>
-                </motion.div>
-              ))}
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
+              {currentMessages.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500 dark:text-gray-400">No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                currentMessages.map((message) => (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`max-w-[70%] ${message.sender === 'me' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-md'} rounded-2xl px-4 py-3`}>
+                      <p className="break-words">{message.text}</p>
+                      <p className={`text-xs mt-1 ${message.sender === 'me' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>{message.time}</p>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Message Input */}
-            <form onSubmit={handleSend} className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <form onSubmit={handleSend} className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -128,13 +187,20 @@ export default function Messages() {
                   onChange={(e) => setMessageText(e.target.value)}
                   placeholder="Type a message..."
                   className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition"
+                  autoFocus
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md"
+                  disabled={!messageText.trim()}
+                  className={`font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center gap-2 ${
+                    messageText.trim() 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer' 
+                      : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                  }`}
                 >
+                  <Send className="w-5 h-5" />
                   Send
                 </motion.button>
               </div>
