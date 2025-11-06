@@ -3,7 +3,7 @@ import { useAuth } from '../App'
 import { useTheme } from '../context/ThemeContext'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { Moon, Sun, LogOut, Compass, MessageCircle, User, Home } from 'lucide-react'
+import { Moon, Sun, LogOut, Compass, MessageCircle, User, Home, Network } from 'lucide-react'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -59,6 +59,13 @@ export default function Navbar() {
                 >
                   <MessageCircle className="w-4 h-4" />
                   Messages
+                </Link>
+                <Link 
+                  to="/posts" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium hidden sm:flex items-center gap-1"
+                >
+                  <Network className="w-4 h-4" />
+                  Community
                 </Link>
                 <Link 
                   to="/profile" 

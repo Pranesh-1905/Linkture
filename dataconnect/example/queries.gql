@@ -1,0 +1,26 @@
+query GetPosts @auth(level: PUBLIC) {
+  posts(orderBy: { createdAt: DESC }, limit: 20) {
+    id
+    title
+    content
+    author {
+      username
+    }
+    createdAt
+    likes
+  }
+}
+
+query GetPostById($id: String!) @auth(level: PUBLIC) {
+  post(id: $id) {
+    id
+    title
+    content
+    author {
+      username
+      email
+    }
+    createdAt
+    likes
+  }
+}

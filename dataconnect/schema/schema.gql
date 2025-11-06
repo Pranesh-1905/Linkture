@@ -1,0 +1,19 @@
+type User @table(key: "id") {
+  id: String!
+  username: String!
+  email: String!
+  createdAt: Timestamp!
+  posts: [Post] @relation
+}
+
+type Post @table(key: "id") {
+  id: String!
+  title: String!
+  content: String!
+  authorId: String!
+  author: User @relation
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  likes: Int!
+  published: Boolean!
+}

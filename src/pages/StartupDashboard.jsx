@@ -85,7 +85,7 @@ export default function StartupDashboard() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Startup Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">Build your profile and connect with investors</p>
+          <div className="text-gray-600 dark:text-gray-400 mb-8">Build your profile and connect with investors</div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Profile Section */}
@@ -236,7 +236,7 @@ export default function StartupDashboard() {
               <BookOpen className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Financial Terms Glossary</h2>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Essential terms every startup founder should know</p>
+            <div className="text-gray-600 dark:text-gray-400 mb-6">Essential terms every startup founder should know</div>
             <div>
               {glossaryTerms.map((item, index) => (
                 <GlossaryItem

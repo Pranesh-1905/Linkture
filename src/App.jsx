@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { useState, createContext, useContext } from 'react'
+import { useState, createContext, useContext, useEffect } from 'react'
 import { ThemeProvider } from './context/ThemeContext'
 import Landing from './pages/landing'
 import Login from './pages/login'
@@ -11,6 +11,8 @@ import StudentDashboard from './pages/StudentDashboard'
 import Explore from './pages/Explore'
 import Messages from './pages/Messages'
 import Profile from './pages/Profile'
+import Posts from './pages/Posts'
+import { auth } from './config/firebase'
 
 
 const AuthContext = createContext()
@@ -19,14 +21,27 @@ export const useAuth = () => useContext(AuthContext)
 
 function App() {
   const [user, setUser] = useState(null)
+ 
 
   const login = (userData) => {
     setUser(userData)
   }
 
-  const logout = () => {
-    setUser(null)
+
+  
+
+  const logout = async () => {
+    try {
+      await auth.signOut() // ← Firebase sign out
+      setUser(null)
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
+
+
+
+  
 
   return (
     <ThemeProvider>
@@ -46,6 +61,7 @@ function App() {
             <Route path="/explore" element={<Explore />} />
             <Route path="/messages" element={user ? <Messages /> : <Navigate to="/login" />} />
             <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+            <Route path='/posts' element={<Posts />}/>
             <Route 
               path="/vc-dashboard" 
               element={user?.role === 'vc' ? <VCDashboard /> : <Navigate to="/login" />} 

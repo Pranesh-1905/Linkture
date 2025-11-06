@@ -6,6 +6,8 @@ import toast from 'react-hot-toast'
 import { useAuth } from '../App'
 import Navbar from '../components/navbar'
 import { Briefcase, Rocket, GraduationCap } from 'lucide-react'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../config/firebase'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -13,6 +15,7 @@ export default function Login() {
   const [role, setRole] = useState('vc')
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
 
   const credentials = {
     vc: { email: 'vc@linkture.com', password: '12345', dashboard: '/vc-dashboard' },
@@ -20,17 +23,110 @@ export default function Login() {
     student: { email: 'student@linkture.com', password: '12345', dashboard: '/student-dashboard' }
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
+    setLoading(true)
     
-    const creds = credentials[role]
-    if (email === creds.email && password === creds.password) {
-      login({ email, role })
-      toast.success(`Welcome back! Redirecting to your dashboard...`)
-      setTimeout(() => navigate(creds.dashboard), 1000)
-    } else {
-      toast.error('Invalid credentials! Please check your email and password.')
+    // Development helper: if entered credentials match the demo mapping,
+    // bypass Firebase and simulate a successful login. This makes the demo
+    // credentials work without needing real Firebase users during local dev.
+    try {
+      if (process.env.NODE_ENV !== 'production') {
+        const matchedRole = Object.keys(credentials).find(
+          (k) => credentials[k].email === email && credentials[k].password === password
+        )
+
+        if (matchedRole) {
+          console.log('Demo credentials matched for role:', matchedRole)
+          const userData = {
+            uid: `demo-${matchedRole}`,
+            email,
+            displayName: email.split('@')[0],
+            role: matchedRole,
+          }
+
+          // Update app context and navigate just like a real login
+          login(userData)
+          toast.success(`Welcome back! Redirecting to your dashboard...`)
+
+          setTimeout(() => {
+            if (matchedRole === 'vc') navigate('/vc-dashboard')
+            else if (matchedRole === 'startup') navigate('/startup-dashboard')
+            else navigate('/student-dashboard')
+          }, 400)
+
+          setLoading(false)
+          return
+        }
+      }
+    } catch (err) {
+      console.error('Demo login helper error:', err)
+      // fall through to normal login attempt
     }
+
+    try {
+      // Firebase Authentication
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // Get user data from Firebase
+      const firebaseUser = userCredential.user
+
+      // TODO: In production, fetch user role from PostgreSQL based on firebaseUser.uid
+      // For now, determine role based on email or use selected role
+      let userRole = role
+      
+      // Optional: You can also determine role from email domain
+      if (email.includes('vc@')) userRole = 'vc'
+      else if (email.includes('startup@')) userRole = 'startup'
+      else if (email.includes('student@')) userRole = 'student'
+
+      const userData = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName || email.split('@')[0],
+        role: userRole
+      }
+
+      // Update app context with user data
+      login(userData)
+      
+      toast.success(`Welcome back! Redirecting to your dashboard...`)
+      
+      // Navigate based on role
+      setTimeout(() => {
+        if (userRole === 'vc') navigate('/vc-dashboard')
+        else if (userRole === 'startup') navigate('/startup-dashboard')
+        else navigate('/student-dashboard')
+      }, 1000)
+
+    } catch (error) {
+      console.error('Login error:', error)
+      
+      // Handle specific Firebase auth errors
+      let errorMessage = 'Invalid credentials! Please check your email and password.'
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email.'
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password.'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email format.'
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later.'
+      }
+      
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Demo login function (optional - for quick testing)
+  const handleDemoLogin = (demoRole) => {
+    const creds = credentials[demoRole]
+    setEmail(creds.email)
+    setPassword(creds.password)
+    setRole(demoRole)
   }
 
   return (

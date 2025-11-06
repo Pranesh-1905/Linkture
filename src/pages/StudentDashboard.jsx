@@ -108,7 +108,7 @@ export default function StudentDashboard() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Student Learning Zone</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">Your journey into entrepreneurship starts here</p>
+          <div className="text-gray-600 dark:text-gray-400 mb-8">Your journey into entrepreneurship starts here</div>
 
           {/* Welcome Banner */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 text-white rounded-xl shadow-lg p-8 mb-8">

@@ -73,7 +73,7 @@ export default function VCDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">VC Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">Manage your portfolio and discover new opportunities</p>
+          <div className="text-gray-600 dark:text-gray-400 mb-8">Manage your portfolio and discover new opportunities</div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

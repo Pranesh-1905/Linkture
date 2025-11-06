@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth } from '../config/firebase'
+import { useAuth } from '../App'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { UserPlus, Mail, Lock, User, Briefcase, GraduationCap, TrendingUp } from 'lucide-react'
@@ -12,15 +15,18 @@ export default function Register() {
     confirmPassword: '',
     role: 'student'
   })
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match!')
       return
@@ -31,8 +37,74 @@ export default function Register() {
       return
     }
 
-    toast.success('Account created successfully!')
-    setTimeout(() => navigate('/login'), 1500)
+    setLoading(true)
+
+    try {
+      // Create Firebase user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth, 
+        formData.email, 
+        formData.password
+      )
+      
+      // Update user profile with display name
+      await updateProfile(userCredential.user, {
+        displayName: formData.name
+      })
+
+      // TODO: In production, save user role to PostgreSQL
+      // const token = await userCredential.user.getIdToken()
+      // await fetch('/api/users', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`,
+      //     'Content-Type': 'application/json'
+      //   },
+      //   body: JSON.stringify({
+      //     firebase_uid: userCredential.user.uid,
+      //     email: formData.email,
+      //     username: formData.name,
+      //     role: formData.role
+      //   })
+      // })
+
+      const userData = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: formData.name,
+        role: formData.role
+      }
+
+      // Update app context
+      login(userData)
+
+      toast.success('Account created successfully!')
+      
+      // Navigate to appropriate dashboard
+      setTimeout(() => {
+        if (formData.role === 'vc') navigate('/vc-dashboard')
+        else if (formData.role === 'startup') navigate('/startup-dashboard')
+        else navigate('/student-dashboard')
+      }, 1500)
+
+    } catch (error) {
+      console.error('Registration error:', error)
+      
+      // Handle specific Firebase errors
+      let errorMessage = 'Failed to create account. Please try again.'
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered. Please sign in.'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address.'
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Use a stronger password.'
+      }
+      
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const roleOptions = [
@@ -90,6 +162,7 @@ export default function Register() {
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
                   placeholder="John Doe"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -109,6 +182,7 @@ export default function Register() {
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
                   placeholder="john@example.com"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -128,6 +202,7 @@ export default function Register() {
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
                   placeholder="••••••••"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -147,6 +222,7 @@ export default function Register() {
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
                   placeholder="••••••••"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -162,13 +238,13 @@ export default function Register() {
                   return (
                     <motion.label
                       key={option.value}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: loading ? 1 : 1.02 }}
+                      whileTap={{ scale: loading ? 1 : 0.98 }}
                       className={`relative flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
                         formData.role === option.value
                           ? `border-${option.color}-500 bg-${option.color}-50 dark:bg-${option.color}-900/20`
                           : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
-                      }`}
+                      } ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <input
                         type="radio"
@@ -177,6 +253,7 @@ export default function Register() {
                         checked={formData.role === option.value}
                         onChange={handleChange}
                         className="sr-only"
+                        disabled={loading}
                       />
                       <Icon className={`w-5 h-5 mr-3 ${
                         formData.role === option.value
@@ -204,12 +281,15 @@ export default function Register() {
 
             {/* Submit Button */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: loading ? 1 : 1.02 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+              disabled={loading}
+              className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 ${
+                loading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
-              Create Account
+              {loading ? 'Creating Account...' : 'Create Account'}
             </motion.button>
           </form>
 
